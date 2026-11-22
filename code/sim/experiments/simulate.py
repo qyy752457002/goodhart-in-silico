@@ -134,9 +134,17 @@ def recall_probe(cfg, out: str = None) -> dict:
 
 
 def fetch_data(cfg) -> list:
-    """Download Dataset A (two parquet files and the dataset card) from the Hugging Face hub."""
+    """Download Dataset A (two parquet files and the dataset card) from the Hugging Face hub.
+
+    The dataset is private: the download needs a Hugging Face token with granted access, read from
+    the environment variable `HF_TOKEN` (or from `.env`).
+    """
+    import urllib.error
     import urllib.request
 
+    utils.load_dotenv(cfg["_root"])
+    token = os.environ.get("HF_TOKEN")
+    headers = {"Authorization": f"Bearer {token}"} if token else {}
     tb = cfg["testbed"]["aasb"]
     target = config_mod.resolve_path(cfg, tb["parquet_dir"])
     os.makedirs(target, exist_ok=True)
@@ -150,7 +158,17 @@ def fetch_data(cfg) -> list:
             log.info("already present: %s", local)
             continue
         log.info("downloading %s/%s", base, remote)
-        with urllib.request.urlopen(f"{base}/{remote}", timeout=120) as resp, open(local, "wb") as f:
-            f.write(resp.read())
+        request = urllib.request.Request(f"{base}/{remote}", headers=headers)
+        try:
+            with urllib.request.urlopen(request, timeout=120) as resp:
+                payload = resp.read()
+        except urllib.error.HTTPError as err:
+            if err.code in (401, 403, 404):
+                raise RuntimeError(
+                    f"Cannot download {tb['hf_repo']} (HTTP {err.code}). The dataset is private: request "
+                    "access from the authors, then set HF_TOKEN in the environment or in .env.") from err
+            raise
+        with open(local, "wb") as f:
+            f.write(payload)
         done.append(local)
     return done

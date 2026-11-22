@@ -61,12 +61,35 @@ Requires Python ≥ 3.10.
 ```bash
 pip install -e ".[all]"
 python -m pytest                 # no data and no LLM needed
-python -m sim fetch-data         # download the AASB dataset into data/raw/
+python -m sim fetch-data         # download the AASB dataset into data/raw/ (access required, see below)
 python -m sim all                # run all experiments with the committed simulators (CPU only)
 ```
 
-`data/simulated/` holds the LLM outputs, so every experiment can be reproduced **without calling
-a model**.
+`data/simulated/` holds the LLM outputs, so once you have the dataset, every experiment can be
+reproduced **without calling a model**.
+
+## Data availability
+
+> **The AASB stance dataset is private and is not included in this repository.**
+
+The experiments on the AASB testbed use staff-annotated stances of organisations on AASB ED SR1.
+These are hosted as a **private** Hugging Face dataset (`testbed.aasb.hf_repo` in
+`configs/default.yaml`). To get access:
+
+1. Request access from the authors (open an issue in this repository).
+2. Once access is granted, put a Hugging Face token in `.env` (`HF_TOKEN=...`, see `.env.example`).
+3. Run `python -m sim fetch-data`.
+
+Without the dataset you can still:
+
+- run the test suite (the 5 tests that need the dataset are skipped);
+- run the full pipeline on synthetic data (`configs/smoke.yaml`) and the toy example (`python -m sim toy`);
+- inspect the published tables and figures in `results/`.
+
+This repository contains only material derived from the dataset: the LLM-predicted stance
+distributions in `data/simulated/`, the organisation-to-group mapping in `data/org_groups.csv`, and
+aggregate results in `results/`. It does not contain the annotated stances themselves. Please do
+not redistribute the dataset.
 
 ## Pipeline
 
@@ -119,4 +142,4 @@ python -m sim all -c configs/smoke.yaml
 
 - [docs/IMPLEMENTATION_NOTES.md](docs/IMPLEMENTATION_NOTES.md): implementation choices, running
   time and what the tests check.
-- The AASB stance data has its own licence. Check it before redistributing derived files.
+- The AASB stance dataset is private; see [Data availability](#data-availability).

@@ -13,7 +13,7 @@ dist/
 .env
 
 # --- Data ---
-# Raw downloads are reproducible: python -m sim fetch-data
+# The AASB dataset is private and must never be committed (python -m sim fetch-data, access required).
 data/raw/
 # Raw LLM replies contain full prompts and are large; kept locally for resumability.
 data/cache/

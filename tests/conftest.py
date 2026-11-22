@@ -15,7 +15,7 @@ AASB_PARQUET = os.path.join(ROOT, "data", "raw", "AASB_Climate_Dataset", "data")
 ORG_GROUPS = os.path.join(ROOT, "data", "org_groups.csv")
 HAS_AASB = os.path.isdir(AASB_PARQUET) and os.path.exists(ORG_GROUPS)
 
-requires_aasb = pytest.mark.skipif(not HAS_AASB, reason="AASB Dataset A not downloaded (python -m sim fetch-data)")
+requires_aasb = pytest.mark.skipif(not HAS_AASB, reason="private AASB dataset not downloaded (see README)")
 
 
 @pytest.fixture(scope="session")
