@@ -402,7 +402,9 @@ def test_a_failing_backend_stops_the_run_and_keeps_finished_replies(tmp_path, sm
         runner = PersonaRunner(prob, source, backend, spec, CallCache(str(tmp_path / f"calls{workers}.jsonl")))
         with pytest.raises(backends.BackendError):
             runner.run("dying", max_workers=workers, cells=np.arange(60))
-        assert state["n"] < 30                                                 # the other cells were never sent
+        # 5 good calls, the failing one, and at most `workers - 1` calls already in flight: the other
+        # cells are never sent, however late the main thread notices the failure
+        assert state["n"] <= 5 + workers
     # resume: replies obtained before the failure are reused
     cache_path = str(tmp_path / "calls.jsonl")
     backend, _ = dying_backend()

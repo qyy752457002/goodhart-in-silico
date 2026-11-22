@@ -151,9 +151,19 @@ class PersonaRunner:
         started = time.time()
         probs = np.zeros((len(cells), len(STANCES)))
         members = np.zeros((spec.n_samples, len(cells), len(STANCES)))
+        # Set as soon as any cell fails. Workers check it before each cell, so after a failure only the
+        # requests already in flight (at most max_workers - 1) are sent, however late the main thread
+        # gets to cancel the queue.
+        stop = threading.Event()
 
         def work(pos: int) -> int:
-            p, m = self.simulate_cell(int(cells[pos]))
+            if stop.is_set():
+                return pos
+            try:
+                p, m = self.simulate_cell(int(cells[pos]))
+            except BaseException:
+                stop.set()
+                raise
             probs[pos] = p
             if spec.n_samples:
                 members[:, pos] = m
@@ -175,6 +185,7 @@ class PersonaRunner:
             except BaseException:
                 # a failed request or Ctrl+C: drop the queued cells instead of sending them anyway
                 # (finished replies are already in the cache, so the run can be resumed)
+                stop.set()
                 pool.shutdown(wait=False, cancel_futures=True)
                 raise
             pool.shutdown()
