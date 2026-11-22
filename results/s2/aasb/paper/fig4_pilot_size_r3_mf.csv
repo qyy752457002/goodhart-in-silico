@@ -1,0 +1,61 @@
+simulator,objective,rho,method,value,series
+r3_mf,utilitarian,0.2,guard,0.627609622944141,true welfare
+r3_mf,utilitarian,0.3,guard,0.6383553377759048,true welfare
+r3_mf,utilitarian,0.4,guard,0.6464456068474553,true welfare
+r3_mf,utilitarian,0.5,guard,0.6515318231859757,true welfare
+r3_mf,utilitarian,0.2,pilot_only,0.6413590575223459,true welfare
+r3_mf,utilitarian,0.3,pilot_only,0.6483057669506482,true welfare
+r3_mf,utilitarian,0.4,pilot_only,0.6535613485697253,true welfare
+r3_mf,utilitarian,0.5,pilot_only,0.656424436642476,true welfare
+r3_mf,utilitarian,0.2,sim_plugin,0.6416113731825586,true welfare
+r3_mf,utilitarian,0.3,sim_plugin,0.6503509580896409,true welfare
+r3_mf,utilitarian,0.4,sim_plugin,0.655485628499706,true welfare
+r3_mf,utilitarian,0.5,sim_plugin,0.6588086777236208,true welfare
+r3_mf,utilitarian,0.2,pilot_sim_plugin,0.644031976314067,true welfare
+r3_mf,utilitarian,0.3,pilot_sim_plugin,0.6528388817294031,true welfare
+r3_mf,utilitarian,0.4,pilot_sim_plugin,0.6587195409333234,true welfare
+r3_mf,utilitarian,0.5,pilot_sim_plugin,0.6617733394042066,true welfare
+r3_mf,utilitarian,0.2,guard,0.1359559214196887,certificate
+r3_mf,utilitarian,0.3,guard,0.1968047536061093,certificate
+r3_mf,utilitarian,0.4,guard,0.27600310719414,certificate
+r3_mf,utilitarian,0.5,guard,0.3535280874895489,certificate
+r3_mf,nash,0.2,guard,0.6279706612373201,true welfare
+r3_mf,nash,0.3,guard,0.6382124940693036,true welfare
+r3_mf,nash,0.4,guard,0.6459866696523252,true welfare
+r3_mf,nash,0.5,guard,0.6510991868360325,true welfare
+r3_mf,nash,0.2,pilot_only,0.6409432923656688,true welfare
+r3_mf,nash,0.3,pilot_only,0.6475190520856795,true welfare
+r3_mf,nash,0.4,pilot_only,0.6527916215822736,true welfare
+r3_mf,nash,0.5,pilot_only,0.6555261042612346,true welfare
+r3_mf,nash,0.2,sim_plugin,0.6397385864677433,true welfare
+r3_mf,nash,0.3,sim_plugin,0.6494045109584738,true welfare
+r3_mf,nash,0.4,sim_plugin,0.6548373129390852,true welfare
+r3_mf,nash,0.5,sim_plugin,0.6581310864322604,true welfare
+r3_mf,nash,0.2,pilot_sim_plugin,0.642481522278093,true welfare
+r3_mf,nash,0.3,pilot_sim_plugin,0.6518774534575167,true welfare
+r3_mf,nash,0.4,pilot_sim_plugin,0.6578112642841156,true welfare
+r3_mf,nash,0.5,pilot_sim_plugin,0.6610534279200929,true welfare
+r3_mf,nash,0.2,guard,0.1352942390685783,certificate
+r3_mf,nash,0.3,guard,0.1953984727001417,certificate
+r3_mf,nash,0.4,guard,0.2749157644751884,certificate
+r3_mf,nash,0.5,guard,0.3525707713784271,certificate
+r3_mf,maxmin,0.2,guard,0.5845832007862002,true welfare
+r3_mf,maxmin,0.3,guard,0.5973818841103313,true welfare
+r3_mf,maxmin,0.4,guard,0.6111415228142946,true welfare
+r3_mf,maxmin,0.5,guard,0.617631190026717,true welfare
+r3_mf,maxmin,0.2,pilot_only,0.5990598838335082,true welfare
+r3_mf,maxmin,0.3,pilot_only,0.608874400513437,true welfare
+r3_mf,maxmin,0.4,pilot_only,0.616538136592684,true welfare
+r3_mf,maxmin,0.5,pilot_only,0.6201341277726551,true welfare
+r3_mf,maxmin,0.2,sim_plugin,0.5944704825168144,true welfare
+r3_mf,maxmin,0.3,sim_plugin,0.6053672707741591,true welfare
+r3_mf,maxmin,0.4,sim_plugin,0.6114326573733447,true welfare
+r3_mf,maxmin,0.5,sim_plugin,0.6165516309516934,true welfare
+r3_mf,maxmin,0.2,pilot_sim_plugin,0.5982463151229688,true welfare
+r3_mf,maxmin,0.3,pilot_sim_plugin,0.610416295950845,true welfare
+r3_mf,maxmin,0.4,pilot_sim_plugin,0.6166633907951357,true welfare
+r3_mf,maxmin,0.5,pilot_sim_plugin,0.6220306892427011,true welfare
+r3_mf,maxmin,0.2,guard,0.117811253676653,certificate
+r3_mf,maxmin,0.3,guard,0.1721412245735134,certificate
+r3_mf,maxmin,0.4,guard,0.25200514704366,certificate
+r3_mf,maxmin,0.5,guard,0.325022974994689,certificate

@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sim-goodhart"
+version = "0.2.0"
+description = "Goodhart in Silico: rectify-then-certify policy design with LLM-simulated stakeholders"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "pyarrow>=12",
+    "scipy>=1.10",
+    "pyyaml>=6",
+]
+
+[project.optional-dependencies]
+plot = ["matplotlib>=3.7"]
+ml = ["scikit-learn>=1.3"]
+dev = ["pytest>=7", "ruff>=0.4"]
+all = ["matplotlib>=3.7", "scikit-learn>=1.3", "pytest>=7", "ruff>=0.4"]
+
+[project.scripts]
+sim = "sim.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["code"]
+include = ["sim*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["code"]
+addopts = "-q"
+filterwarnings = ["error::RuntimeWarning:sim"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+extend-exclude = []
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E741", "B905", "UP006", "UP007", "UP035", "UP045"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E731", "B018"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["sim"]

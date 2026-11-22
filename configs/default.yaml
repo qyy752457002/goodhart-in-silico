@@ -1,0 +1,225 @@
+# Default configuration: every parameter of the methodology (03_methodology.md, v0.2).
+# Override with a second file (--config my.yaml) and/or --set key.sub=value.
+# Section references such as "(S7)" point to sections of the methodology note.
+
+project:
+  seed: 20261121
+  log_level: INFO
+  n_jobs: 1                       # worker processes for replicated pilots (results do not depend on it)
+
+paths:
+  results_dir: results            # experiment outputs: <results_dir>/<testbed>/<experiment>/
+  simulated_dir: data/simulated   # precomputed LLM stance distributions (small; worth releasing)
+  cache_dir: data/cache           # raw LLM replies, one JSONL file per model (resumable; git-ignored)
+
+# ---------------------------------------------------------------------------------------------
+# Testbeds (S6)
+# ---------------------------------------------------------------------------------------------
+testbed:
+  name: aasb                      # aasb | opinionqa | synthetic | toy
+  aasb:
+    hf_repo: qyy752457002/AASB_Climate_Dataset
+    parquet_dir: data/raw/AASB_Climate_Dataset/data
+    org_groups_csv: data/org_groups.csv
+    board_decisions_csv: data/board_decisions.csv
+    org_profiles_csv: data/org_profiles.csv   # optional one-sentence anonymous descriptions (R1b)
+    responses_dir: ../Responses               # per-question response texts (recall probe only)
+    decision_set: main            # main (18 decisions) | main+nfp (adds Q24, Q26, Q27, Q29) | nfp
+    grouping: coarse4             # coarse4 | coarse3 | coarse2 | fine  (S8)
+    context_mode: outside         # scenario S2 context: outside | loo | explicit  (S1.3)
+    context_questions: []         # question ids for context_mode: explicit
+    context_use_rationale: true   # include the extracted reasons of the context answers
+  opinionqa:                      # second testbed; see configs/opinionqa_example.yaml
+    spec_file: configs/opinionqa_example.yaml
+  synthetic:                      # latent-attitude generator, AASB-shaped by default
+    group_sizes: [38, 27, 20, 15]
+    n_dec: 18
+    response_rate: 0.56
+    disagreement: 1.0
+    org_sd: 0.6
+    mean_support: 0.6
+    seed: 0
+  toy:
+    n_per_group: 4
+
+# ---------------------------------------------------------------------------------------------
+# Welfare (S1.1)
+# ---------------------------------------------------------------------------------------------
+welfare:
+  sigma_map: graded               # graded | binary
+  qualified_weight: 0.75          # support of qualified_agree (S8 sensitivity: 0.6 / 0.75 / 0.9)
+  group_weights: equal            # equal | size
+  objectives: [utilitarian, nash, maxmin]
+
+# ---------------------------------------------------------------------------------------------
+# GUARD and certificates (S4, S7)
+# ---------------------------------------------------------------------------------------------
+guard:
+  delta: 0.1                      # total error budget, split equally across groups
+  base_set: top1                  # top1 | topk | mass
+  base_set_k: 1
+  base_set_mass: 0.9
+  miss_rule: sigma_hull           # sigma_hull | label
+  ucb: betting                    # main certificate: betting | hoeffding_serfling
+  betting_strategy: prpl          # prpl | dkelly
+  betting_c: 0.75
+  split_two_sided: false          # true = spend delta_g / 2 per side (not needed: S+ equals S-)
+  clip_trivial: true              # never report a lower bound below the known part
+  count_rank: best                # GUARD-count: best | max | quantile in (0, 1]
+  cons_delta: 0.1                 # GUARD-cons: error budget of the improvement test
+  cons_bound: t                   # t (moderated t, asymptotic) | hoeffding_serfling (finite-sample, very wide)
+  cons_prior_obs: 2.0             # moderated t: prior degrees of freedom on the worst-case variance
+  ens_kappa: 1.0                  # Ensemble-LCB: mean - kappa * sd
+  hedgetune_log2n: []             # [] = 0, 2, ..., Q
+  hedgetune_estimate: pilot_only  # pilot_only | rectified
+
+# ---------------------------------------------------------------------------------------------
+# Simulators (S2.1). Ids are free-form; experiments refer to them by id.
+# ---------------------------------------------------------------------------------------------
+simulators:
+  # S1: zero-shot personas. cutoff_group is used by the leakage contrasts (S2.2).
+  r1a_llama:  {kind: persona, variant: named,     model: llama31_8b, cutoff_group: early}
+  r1b_llama:  {kind: persona, variant: anonymous, model: llama31_8b, cutoff_group: early}
+  r1a_gpt:    {kind: persona, variant: named,     model: gpt6_luna, cutoff_group: late}
+  r1b_gpt:    {kind: persona, variant: anonymous, model: gpt6_luna, cutoff_group: late}
+  # S2: the persona also sees the organisation's answers to the context questions.
+  r2_llama:   {kind: persona, variant: context, identity: named, model: llama31_8b, cutoff_group: early}
+  r2_gpt:     {kind: persona, variant: context, identity: named, model: gpt6_luna, cutoff_group: late}
+  # Ens: several LLMs x prompt variants.
+  ens_s1:     {kind: ensemble, members: [r1a_llama, r1b_llama, r1a_gpt, r1b_gpt]}
+  # Fitted on observed stances: cross-fitted for RQ1/RQ2, refitted on every pilot for RQ3.
+  r0_prior:   {kind: type_prior, alpha: 1.0}
+  r3_mf:      {kind: relational, model: mf, rank: 3, ridge: 1.0}
+  r3_gbdt:    {kind: relational, model: gbdt}
+  # References.
+  uniform:    {kind: uniform}
+
+llm:
+  # Model entries. `backend`: ollama | openai_compat | mock. Fields other than `backend`, `cutoff`,
+  # `notes`, `max_workers` and `max_tokens` are passed to the backend (see simulators/backends.py).
+  models:
+    llama31_8b:
+      backend: ollama
+      model: "llama3.1:8b-instruct-q4_K_M"   # ~5 GB; check the tag with `ollama list`
+      host: http://localhost:11434
+      num_ctx: 8192
+      cutoff: "2023-12"           # pretraining cut-off per the model card: before the letters (S2.2)
+      max_workers: 1
+    gpt6_luna:
+      backend: openai_compat
+      model: gpt-6-luna           # OpenAI's successor to gpt-5.4-nano (which is shut down on 2027-04-01)
+      base_url: https://api.openai.com/v1
+      api_key_env: OPENAI_API_KEY
+      send_temperature: true      # dropped automatically (with a warning) if the API rejects it
+      send_seed: true
+      max_tokens_field: max_completion_tokens
+      # The model reasons at effort "medium" unless told otherwise. Reasoning tokens are billed as
+      # output and count against max_tokens, so an unset effort means empty replies and a higher bill.
+      extra_body: {reasoning_effort: "none"}
+      cutoff: "2026-05"           # knowledge cut-off per the model page (2026-05-18): after the letters
+      max_workers: 8
+      max_tokens: 400
+    mock:
+      backend: mock               # deterministic fake replies: pipeline checks only, never results
+      model: mock
+  persona:                        # defaults for every persona simulator (S2.3)
+    temperature: 0.0
+    n_shuffles: 1                 # calls per cell at `temperature`, each with a new option order
+    n_samples: 5                  # K sampled calls per cell (ensemble dispersion)
+    sample_temperature: 0.7
+    max_tokens: 200
+    max_parse_retries: 2
+    json_mode: true
+    max_context_items: 16
+    seed: 0
+
+on_missing_simulator: error       # error | skip  (a persona simulator that was not precomputed)
+
+# ---------------------------------------------------------------------------------------------
+# RQ1: simulator validity (S2.4)
+# ---------------------------------------------------------------------------------------------
+rq1:
+  simulators: [r1a_llama, r1b_llama, r1a_gpt, r1b_gpt, ens_s1, r0_prior, r3_mf, uniform]
+  cv_folds: 5                     # cross-fitting of the fitted simulators
+  n_boot: 1000                    # organisation-clustered bootstrap
+  contrasts:                      # leakage controls (S2.2): [simulator A, simulator B, label]
+    - [r1a_llama, r1b_llama, "named vs anonymous (early cut-off)"]
+    - [r1a_gpt, r1b_gpt, "named vs anonymous (late cut-off)"]
+    - [r1a_gpt, r1a_llama, "late vs early cut-off (named)"]
+    - [r1b_gpt, r1b_llama, "late vs early cut-off (anonymous)"]
+
+# ---------------------------------------------------------------------------------------------
+# RQ2: Goodhart protocol (S3)
+# ---------------------------------------------------------------------------------------------
+rq2:
+  simulators: [r1a_llama, r1b_llama, r1a_gpt, r1b_gpt, ens_s1]
+  log2_n: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]   # values above Q are dropped; Q is always included
+  reps: 2000                      # best-of-N draws per pressure level
+  cv_folds: 5
+
+# ---------------------------------------------------------------------------------------------
+# RQ3: rectify-then-certify (S4, S5, S7)
+# ---------------------------------------------------------------------------------------------
+rq3:
+  simulators: [r1a_llama, r1a_gpt, ens_s1, r0_prior]
+  rhos: [0.2, 0.3, 0.4, 0.5]      # pilot fraction per group
+  reps: 500                       # random pilots per fraction
+  methods: [ed, ifrs, board, oracle, sim_plugin, pilot_only, pilot_sim_plugin, ens_lcb, ens_wco,
+            pilot_ens_lcb, hedgetune, guard, guard_pess, guard_est, guard_cons]
+  certificates: [betting, hoeffding_serfling, count, pooled]
+  reference_method: guard         # paired Wilcoxon tests compare every method with this one
+  fit_fraction: 0.5               # share of the pilot used to fit r0 / r3 (rest calibrates)
+  n_boot: 1000
+  pilot:
+    design: srs                   # srs | tilted (S8: non-random pilots)
+    tilt_by: misset               # misset | support | n_responses
+    gamma: -1.0                   # exp(gamma * z); < 0 under-samples high scores
+
+# ---------------------------------------------------------------------------------------------
+# Synthetic injection (S3, S12; Fig. 5, Propositions A-C)
+# ---------------------------------------------------------------------------------------------
+synthetic:
+  n_sim_seeds: 5                  # independent draws of each synthetic simulator
+  rhos: [0.3, 0.5]
+  reps: 20                        # pilots per simulator draw and fraction (100 per cell in total)
+  n_members: 5                    # ensemble members sharing the same error mechanism
+  methods: [ed, oracle, sim_plugin, pilot_only, pilot_sim_plugin, ens_lcb, pilot_ens_lcb, hedgetune,
+            guard, guard_pess, guard_est, guard_cons]
+  certificates: [betting, hoeffding_serfling, count, pooled]
+  scenarios:
+    - {name: iid, mode: iid, e: [0.1, 0.3]}
+    - {name: structured, mode: structured, groups: all, k: 4, e_s: [0.0, 0.3, 0.6, 0.9], e_bg: 0.1}
+
+# ---------------------------------------------------------------------------------------------
+# Sensitivity analysis (S8): each variant is a set of overrides applied to this configuration.
+# ---------------------------------------------------------------------------------------------
+sensitivity:
+  simulators: [r1a_llama]
+  rhos: [0.3]
+  reps: 200
+  methods: [ed, oracle, sim_plugin, pilot_sim_plugin, guard]
+  variants:
+    - {name: baseline, set: {}}
+    - {name: sigma_binary, set: {welfare.sigma_map: binary}}
+    - {name: qualified_0.6, set: {welfare.qualified_weight: 0.6}}
+    - {name: qualified_0.9, set: {welfare.qualified_weight: 0.9}}
+    - {name: groups_2, set: {testbed.aasb.grouping: coarse2}}
+    - {name: groups_3, set: {testbed.aasb.grouping: coarse3}}
+    - {name: weights_by_size, set: {welfare.group_weights: size}}
+    - {name: base_set_top2, set: {guard.base_set: topk, guard.base_set_k: 2}}
+    - {name: pilot_avoids_misread, set: {rq3.pilot.design: tilted, rq3.pilot.tilt_by: misset, rq3.pilot.gamma: -1.0}}
+    - {name: pilot_favours_supporters, set: {rq3.pilot.design: tilted, rq3.pilot.tilt_by: support, rq3.pilot.gamma: 1.0}}
+
+# ---------------------------------------------------------------------------------------------
+# Verbatim-recall probe (S2.2, optional)
+# ---------------------------------------------------------------------------------------------
+recall_probe:
+  models: [llama31_8b, gpt6_luna]
+  n_passages: 20
+  prefix_words: 60
+  suffix_words: 40
+  min_words: 120
+
+figures:
+  formats: [pdf, png]
+  dpi: 200

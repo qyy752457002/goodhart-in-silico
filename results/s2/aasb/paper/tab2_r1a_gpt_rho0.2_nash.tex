@@ -1,0 +1,27 @@
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lrrrrrr}
+\toprule
+method & true welfare & regret & worst-group welfare & coverage & certificate & slack \\
+\midrule
+ED (retain all) & 0.623 & 0.043 & 0.549 & 1.000 & 0.123 & 0.500 \\
+IFRS baseline (revise all) & 0.363 & 0.304 & 0.244 & 1.000 & 0.070 & 0.293 \\
+Board's decision & 0.410 & 0.257 & 0.301 & 1.000 & 0.080 & 0.330 \\
+Oracle & \textbf{0.667} & \textbf{0.000} & \textbf{0.613} & 1.000 & 0.132 & 0.534 \\
+Simulator plug-in & 0.623 & 0.043 & 0.549 & 1.000 & 0.123 & 0.500 \\
+Pilot only & 0.641 & 0.026 & 0.603 & 1.000 & 0.140 & 0.501 \\
+Pilot + simulator plug-in & 0.623 & 0.043 & 0.549 & 1.000 & 0.123 & 0.500 \\
+Ensemble-LCB & 0.623 & 0.043 & 0.549 & 1.000 & 0.123 & 0.500 \\
+Ensemble worst case & 0.623 & 0.043 & 0.549 & 1.000 & 0.123 & 0.500 \\
+Pilot + Ensemble-LCB & 0.624 & 0.043 & 0.550 & 1.000 & 0.123 & 0.500 \\
+HedgeTune & 0.622 & 0.045 & 0.549 & 1.000 & 0.123 & 0.499 \\
+GUARD (rectify) & 0.640 & 0.027 & 0.601 & 1.000 & 0.139 & 0.501 \\
+GUARD-pess & 0.641 & 0.026 & 0.603 & 1.000 & 0.140 & 0.501 \\
+GUARD-est & 0.623 & 0.043 & 0.549 & 1.000 & 0.123 & 0.500 \\
+GUARD-cons & 0.623 & 0.043 & 0.549 & 1.000 & 0.123 & 0.500 \\
+\bottomrule
+\end{tabular}
+\caption{Decision rules (r1a\_gpt, pilot fraction 0.2, nash).}
+\label{tab:methods-nash}
+\end{table}

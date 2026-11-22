@@ -1,0 +1,60 @@
+# Pipeline check: a small synthetic consultation, synthetic simulators and the MOCK LLM backend.
+# Runs every command end to end in about a minute and touches no real data and no real model.
+# Its numbers mean nothing -- it only shows that the pipeline is wired correctly.
+#
+#   python -m sim simulate -c configs/smoke.yaml -m mock_named -m mock_anon
+#   python -m sim rq1 -c configs/smoke.yaml     (then rq2, rq3, synthetic, sensitivity, report)
+
+paths:
+  results_dir: results/_smoke
+  simulated_dir: results/_smoke/simulated
+  cache_dir: results/_smoke/cache
+
+testbed:
+  name: synthetic
+  synthetic: {group_sizes: [14, 12, 10, 8], n_dec: 8, response_rate: 0.7, seed: 1}
+
+simulators:
+  mock_named: {kind: persona, variant: named, model: mock}
+  mock_anon:  {kind: persona, variant: anonymous, model: mock}
+  noise:      {kind: synthetic, mode: iid, e: 0.2, seed: 1, n_members: 3}
+  misread:    {kind: synthetic, mode: structured, group: 0, e_s: 0.9, k: 2, seed: 2, n_members: 3}
+
+llm:
+  persona: {n_samples: 2}
+
+rq1:
+  simulators: [mock_named, mock_anon, noise, misread, r0_prior, r3_mf, uniform]
+  cv_folds: 3
+  n_boot: 100
+  contrasts:
+    - [mock_named, mock_anon, "named vs anonymous (mock)"]
+
+rq2:
+  simulators: [noise, misread]
+  reps: 300
+
+rq3:
+  simulators: [misread, noise, r0_prior]
+  rhos: [0.3, 0.5]
+  reps: 20
+  n_boot: 200
+
+synthetic:
+  n_sim_seeds: 2
+  rhos: [0.3, 0.5]
+  reps: 5
+  n_members: 3
+  scenarios:
+    - {name: iid, mode: iid, e: [0.1, 0.3]}
+    - {name: structured, mode: structured, groups: all, k: 2, e_s: [0.0, 0.5, 0.9], e_bg: 0.1}
+
+sensitivity:
+  simulators: [misread]
+  rhos: [0.5]
+  reps: 10
+  variants:
+    - {name: baseline, set: {}}
+    - {name: sigma_binary, set: {welfare.sigma_map: binary}}
+    - {name: weights_by_size, set: {welfare.group_weights: size}}
+    - {name: pilot_avoids_misread, set: {rq3.pilot.design: tilted, rq3.pilot.tilt_by: misset, rq3.pilot.gamma: -1.0}}

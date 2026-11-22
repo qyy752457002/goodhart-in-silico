@@ -1,0 +1,55 @@
+{
+  "name": "r1b_llama",
+  "n_cells": 1177,
+  "n_members": 5,
+  "classes": [
+    "agree",
+    "qualified_agree",
+    "mixed",
+    "qualified_disagree",
+    "alternative_proposal",
+    "disagree"
+  ],
+  "kind": "persona",
+  "variant": "anonymous",
+  "backend": {
+    "kind": "ollama",
+    "model": "llama3.1:8b-instruct-q4_K_M",
+    "num_ctx": 8192,
+    "options": {}
+  },
+  "spec": {
+    "variant": "anonymous",
+    "identity": "named",
+    "temperature": 0.0,
+    "n_shuffles": 1,
+    "n_samples": 5,
+    "sample_temperature": 0.7,
+    "max_tokens": 200,
+    "seed": 0,
+    "max_parse_retries": 2,
+    "json_mode": true,
+    "max_context_items": 16,
+    "prompt_version": "v1"
+  },
+  "counts": {
+    "calls": 7028,
+    "cached": 34,
+    "parse_ok": 4565,
+    "parse_repaired": 2497,
+    "parse_failed": 0,
+    "fallback_uniform": 0,
+    "default_temperature": 0,
+    "prompt_tokens": 4550757,
+    "completion_tokens": 449646
+  },
+  "parse_failure_rate": 0.0,
+  "fallback_rate": 0.0,
+  "temperature_honoured": true,
+  "p_hat": "mean of the 1 reply(ies) at temperature 0",
+  "seconds": 22785.0,
+  "model_id": "llama31_8b",
+  "testbed": "aasb",
+  "cutoff": "2023-12",
+  "is_mock": false
+}

@@ -1,0 +1,42 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+build/
+dist/
+
+# --- Secrets: API keys live in .env, never in the repository ---
+.env
+
+# --- Data ---
+# Raw downloads are reproducible: python -m sim fetch-data
+data/raw/
+# Raw LLM replies contain full prompts and are large; kept locally for resumability.
+data/cache/
+# data/simulated/ (LLM stance distributions) IS committed so experiments reproduce without API calls.
+
+# --- Results: only the paper tables/figures are tracked ---
+results/*
+!results/aasb/
+results/aasb/*
+!results/aasb/paper/
+!results/s2/
+results/s2/*
+!results/s2/aasb/
+results/s2/aasb/*
+!results/s2/aasb/paper/
+
+# --- Private research material ---
+literature/
+0[0-9]_*.md
+
+# --- OS / editors ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp

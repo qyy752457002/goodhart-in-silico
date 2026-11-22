@@ -1,0 +1,46 @@
+# TEMPLATE specification for the second testbed (OpinionQA / Pew American Trends Panel).
+#
+# This file is an example of the *format*, not a ready-to-run specification: the wave, the column
+# names, the question keys and the answer strings below are placeholders and must be replaced after
+# you have downloaded the data (Santurkar et al., 2023, "Whose Opinions Do Language Models
+# Reflect?"; the survey files require a free Pew Research Center account).
+#
+#   1. python -m sim opinionqa-inspect --dir data/raw/opinionqa/<wave folder>
+#      lists every column with 2-8 answer options, with counts and (if info.csv exists) the question.
+#   2. Choose the policy questions that can be read as "adopt this proposal or not" and map each
+#      answer option to a stance class: agree | qualified_agree | mixed | qualified_disagree |
+#      alternative_proposal | disagree. Answers that are not listed (e.g. "Refused") count as no
+#      response.
+#   3. python -m sim describe --set testbed.name=opinionqa
+#
+# Paths are relative to the repository root.
+
+responses_csv: data/raw/opinionqa/American_Trends_Panel_W00/responses.csv   # PLACEHOLDER wave
+info_csv: data/raw/opinionqa/American_Trends_Panel_W00/info.csv             # optional: question texts
+respondent_id: null             # column with a unique respondent id; null = number the rows
+
+group_column: POLPARTY          # PLACEHOLDER: the demographic attribute that defines the groups
+groups:                         # raw value -> group name; respondents with other values are dropped
+  Republican: Republican
+  Democrat: Democrat
+  Independent: Independent
+  Something else: Other
+
+persona_columns: [AGE, SEX, EDUCATION, RACE, CREGION, INCOME, POLIDEOLOGY, RELIG]   # PLACEHOLDERS
+
+max_per_group: 500              # random subsample per group (keeps enumeration and LLM cost bounded)
+seed: 0
+
+proposals:                      # at most 24 (enumeration limit); each becomes one binary decision
+  - key: EXAMPLE_POLICY_A_W00   # PLACEHOLDER column name
+    text: "Do you favor or oppose <policy A>?"
+    support:
+      Strongly favor: agree
+      Somewhat favor: qualified_agree
+      Somewhat oppose: qualified_disagree
+      Strongly oppose: disagree
+  - key: EXAMPLE_POLICY_B_W00   # PLACEHOLDER column name
+    text: "Should the government <policy B>?"
+    support:
+      "Yes": agree
+      "No": disagree

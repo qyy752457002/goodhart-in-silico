@@ -1,0 +1,24 @@
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lrrrrrr}
+\toprule
+method & true welfare & regret & worst-group welfare & coverage & certificate & slack \\
+\midrule
+ED (retain all) & 0.628 & 0.040 & 0.549 & 1.000 & 0.135 & 0.493 \\
+IFRS baseline (revise all) & 0.372 & 0.295 & 0.244 & 1.000 & 0.073 & 0.299 \\
+Board's decision & 0.416 & 0.251 & 0.301 & 1.000 & 0.082 & 0.334 \\
+Oracle & \textbf{0.667} & \textbf{0.000} & \textbf{0.613} & 1.000 & 0.135 & 0.533 \\
+Simulator plug-in & 0.634 & 0.033 & 0.582 & 1.000 & 0.137 & 0.497 \\
+Pilot only & 0.641 & 0.026 & 0.601 & 1.000 & 0.141 & 0.500 \\
+Pilot + simulator plug-in & 0.642 & 0.025 & 0.593 & 1.000 & 0.139 & 0.503 \\
+HedgeTune & 0.635 & 0.033 & 0.585 & 1.000 & 0.137 & 0.498 \\
+GUARD (rectify) & 0.629 & 0.039 & 0.584 & 1.000 & 0.137 & 0.492 \\
+GUARD-pess & 0.629 & 0.039 & 0.570 & 1.000 & 0.150 & 0.479 \\
+GUARD-est & 0.634 & 0.033 & 0.583 & 1.000 & 0.138 & 0.496 \\
+GUARD-cons & 0.628 & 0.040 & 0.549 & 1.000 & 0.135 & 0.493 \\
+\bottomrule
+\end{tabular}
+\caption{Decision rules (r0\_prior, pilot fraction 0.2, utilitarian).}
+\label{tab:methods-utilitarian}
+\end{table}

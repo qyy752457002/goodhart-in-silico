@@ -1,0 +1,58 @@
+{
+  "name": "r1a_gpt",
+  "n_cells": 1177,
+  "n_members": 5,
+  "classes": [
+    "agree",
+    "qualified_agree",
+    "mixed",
+    "qualified_disagree",
+    "alternative_proposal",
+    "disagree"
+  ],
+  "kind": "persona",
+  "variant": "named",
+  "backend": {
+    "kind": "openai_compat",
+    "model": "gpt-6-luna",
+    "base_url": "https://api.openai.com/v1",
+    "send_temperature": true,
+    "extra_body": {
+      "reasoning_effort": "none"
+    }
+  },
+  "spec": {
+    "variant": "named",
+    "identity": "named",
+    "temperature": 0.0,
+    "n_shuffles": 1,
+    "n_samples": 5,
+    "sample_temperature": 0.7,
+    "max_tokens": 400,
+    "seed": 0,
+    "max_parse_retries": 2,
+    "json_mode": true,
+    "max_context_items": 16,
+    "prompt_version": "v1"
+  },
+  "counts": {
+    "calls": 6942,
+    "cached": 120,
+    "parse_ok": 7031,
+    "parse_repaired": 31,
+    "parse_failed": 0,
+    "fallback_uniform": 0,
+    "default_temperature": 0,
+    "prompt_tokens": 4463478,
+    "completion_tokens": 347124
+  },
+  "parse_failure_rate": 0.0,
+  "fallback_rate": 0.0,
+  "temperature_honoured": true,
+  "p_hat": "mean of the 1 reply(ies) at temperature 0",
+  "seconds": 1567.3,
+  "model_id": "gpt6_luna",
+  "testbed": "aasb",
+  "cutoff": "2026-05",
+  "is_mock": false
+}

@@ -1,0 +1,24 @@
+# Scenario S2 (follow-up round, methodology section 1.3): every organisation's answers to the
+# questions outside the decision set are known, and simulators may use them.
+#   R2  context personas   r2_llama, r2_gpt      (precompute first: python -m sim simulate -m r2_gpt -m r2_llama)
+#   R3  relational models  r3_mf, r3_gbdt        (fitted on the fly; they use the context answers)
+# The zero-shot personas are kept as the S1 reference. Results go to results/s2/ so that the S1 run
+# is not overwritten.
+#
+#   python -m sim all -c configs/s2.yaml --steps rq1 rq2 rq3 report
+
+paths:
+  results_dir: results/s2
+
+rq1:
+  simulators: [r1a_llama, r1a_gpt, r2_llama, r2_gpt, r0_prior, r3_mf, r3_gbdt, uniform]
+  contrasts:
+    - [r2_llama, r1a_llama, "context vs zero-shot (early cut-off)"]
+    - [r2_gpt, r1a_gpt, "context vs zero-shot (late cut-off)"]
+    - [r2_gpt, r2_llama, "late vs early cut-off (context)"]
+
+rq2:
+  simulators: [r1a_llama, r1a_gpt, r2_llama, r2_gpt, r3_mf, r3_gbdt]
+
+rq3:
+  simulators: [r1a_gpt, r2_llama, r2_gpt, r3_mf, r3_gbdt]
