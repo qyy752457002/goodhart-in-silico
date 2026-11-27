@@ -90,8 +90,12 @@ def test_board_decisions_file(root_dir):
     # 15 of the 18 main decisions were reverted to the IFRS baseline
     assert board.shape == (18,) and int((board == 0).sum()) == 15
     assert [q for q, a in zip(main, board) if a == 1] == [4, 11, 15]
-    # every row inferred rather than read from Appendix A is flagged for review
-    assert (table.loc[table["listed_in_appendix_a"] == 0, "needs_review"] == 1).all()
+    # Rows that are not in Appendix A were first inferred as "retained". The three main decisions among them were
+    # confirmed on 2026-11-23 against the Basis for Conclusions on AASB S2 (BC28, BC40, BC60 and BC64) and are no
+    # longer flagged; the three rows of the NFP extension set are still inferred and stay flagged for review.
+    inferred = table[table["listed_in_appendix_a"] == 0]
+    assert sorted(inferred["decision_qid"]) == [4, 11, 15, 26, 27, 29]
+    assert sorted(table.loc[table["needs_review"] == 1, "decision_qid"]) == [26, 27, 29]
     assert data.load_board_decisions(path, [2, 3, 99]) is None
     assert data.load_board_decisions(os.path.join(root_dir, "nope.csv"), main) is None
 
@@ -217,7 +221,7 @@ def test_aasb_problem_matches_the_methodology(aasb):
     assert prob.decisions == [2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 15, 16, 17, 18, 19, 20, 21, 23]
     assert set(np.unique(prob.cell_q)) == set(data.MAIN_DECISIONS)         # includes Q14 -> decision 13
     assert tb.board is not None and int((tb.board == 0).sum()) == 15
-    assert tb.meta["n_orgs_needing_review"] == 9
+    assert tb.meta["n_orgs_needing_review"] == 0
     assert tb.context.shape == (100, len(tb.context_qids)) and not set(tb.context_qids) & set(data.MAIN_DECISIONS)
     assert np.nanmin(tb.context) >= 0 and np.nanmax(tb.context) <= 1 and np.isnan(tb.context).any()
 
@@ -351,7 +355,8 @@ def test_aasb_variants_load(root_dir):
 @requires_aasb
 def test_org_table_is_consistent(root_dir):
     table = data.read_org_table(ORG_GROUPS)
-    assert len(table) == 107 and table["needs_review"].sum() == 9
+    # the nine borderline assignments (data.UNCERTAIN) were reviewed by hand: none was changed, none is flagged now
+    assert len(table) == 107 and table["needs_review"].sum() == 0
     assert (table["group"] == table["fine_type"].map(data.COARSE)).all()
     assert (table["fine_type"] == table["org"].map(data.fine_type)).all()
     profiles = pd.read_csv(os.path.join(root_dir, "data", "org_profiles.csv")).fillna("")
